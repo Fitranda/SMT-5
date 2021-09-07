@@ -5,9 +5,8 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-import javax.xml.transform.Result;
 
-public class Response {
+public class Responses {
     @SerializedName("page")
     @Expose
     private Integer page;

@@ -1,20 +1,20 @@
 package com.itbrain.catalogmovie.activity;
 
+import androidx.appcompat.widget.SearchView;
+import android.os.Bundle;
+import android.view.Menu;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Bundle;
-import android.view.Menu;
-import android.widget.SearchView;
-
 import com.itbrain.catalogmovie.R;
 import com.itbrain.catalogmovie.adapter.MovieAdapter;
+import com.itbrain.catalogmovie.model.Responses;
 import com.itbrain.catalogmovie.model.Result;
 import com.itbrain.catalogmovie.rest.ApiClient;
 import com.itbrain.catalogmovie.rest.ApiInterface;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     String CATEGORY = "popular";
     int page = 1;
     RecyclerView recyclerview;
-//    List<Result> mList;
+    List<Result> LList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,19 +40,44 @@ public class MainActivity extends AppCompatActivity {
         recyclerview = findViewById(R.id.rvMovie);
         recyclerview.setHasFixedSize(true);
         recyclerview.setLayoutManager(new LinearLayoutManager(this));
+//        adapter = new MovieAdapter(this,LList);
+//        recyclerview.setAdapter(adapter);
 //        mList = new ArrayList<Result>();
         CallRetrofit();
+//        CRetrofit();
+    }
+
+    private void CRetrofit() {
+        ApiClient.getRetrofitClient().getMovie(CATEGORY,API_KEY,language,page).enqueue(new Callback<Responses>() {
+            @Override
+            public void onResponse(Call<Responses> call, Response<Responses> response) {
+//
+                if (response.isSuccessful() && response.body() != null) {
+//                    mList = re
+                    List<Result> mLists ;
+                    mLists = response.body().getResults();
+                    adapter = new MovieAdapter(MainActivity.this,mLists);
+                    recyclerview.setAdapter(adapter);
+                }
+//
+            }
+
+            @Override
+            public void onFailure(Call<Responses> call, Throwable t) {
+
+            }
+        });
     }
 
     private void CallRetrofit() {
         ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
-        Call<Response> call = apiInterface.getMovie(CATEGORY,API_KEY,language,page);
-        call.enqueue(new Callback<Response>() {
+        Call<Responses> call = apiInterface.getMovie(CATEGORY,API_KEY,language,page);
+        call.enqueue(new Callback<Responses>() {
             @Override
-            public void onResponse(Call<Response> call, Response<Response> response) {
+            public void onResponse(Call<Responses> call, Response<Responses> response) {
 //
                 if (response.isSuccessful() && response.body() != null) {
-//                    mList = re
+//
                     List<Result> mList = response.body().getResults();
                     adapter = new MovieAdapter(MainActivity.this,mList);
                     recyclerview.setAdapter(adapter);
@@ -61,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<Response> call, Throwable t) {
+            public void onFailure(Call<Responses> call, Throwable t) {
 
             }
         });
@@ -81,10 +106,10 @@ public class MainActivity extends AppCompatActivity {
             public boolean onQueryTextChange(String newText) {
                 if(newText.length() > 1){
                     ApiInterface apiInterface =ApiClient.getClient().create(ApiInterface.class);
-                    Call<Response> call = apiInterface.getQuery(API_KEY,language,newText,page);
-                    call.enqueue(new Callback<Response>() {
+                    Call<Responses> call = apiInterface.getQuery(API_KEY,language,newText,page);
+                    call.enqueue(new Callback<Responses>() {
                         @Override
-                        public void onResponse(Call<Response> call, Response<Response> response) {
+                        public void onResponse(Call<Responses> call, Response<Responses> response) {
                             if (response.isSuccessful() && response.body() != null) {
 //                    mList = re
                                 List<Result> mList = response.body().getResults();
@@ -94,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onFailure(Call<Response> call, Throwable t) {
+                        public void onFailure(Call<Responses> call, Throwable t) {
 
                         }
                     });
